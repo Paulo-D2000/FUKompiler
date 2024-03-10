@@ -17,7 +17,7 @@ void printUsage(const std::vector<std::string>& args){
 
     std::cout << "Welcome to FUKompiler!\n";
     if(args.size() < 2){
-        std::cerr << "Usage: FUK input.cpp [output.asm]\n";
+        std::cerr << "Usage: FUK input.c [output.asm]\n";
         exit(-1);
     }
 
