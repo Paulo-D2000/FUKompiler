@@ -2,12 +2,25 @@
 #include <vector>
 #include <string>
 
-#define LogError(err) std::cerr << "ERROR - " << __FUNCTION__ << "() " << err << "\n";
-#define LogDebug(dbg) std::cerr << "DEBUG - " << __FUNCTION__ << "() " << dbg << "\n";
-
+#include "Common.h"
+#include "Lexer.h"
 
 void Compile(const std::string& InputFileName, const std::string& OutpuFileName){
-    LogError("Function Not Implemented!");
+    std::ifstream inFile(InputFileName);
+    if(!inFile.good()){
+        LogError("Unable to open file \'" << InputFileName << "\'");
+    }
+    std::string contents;
+    while(inFile){
+        contents += inFile.get();
+    }
+    
+    Lexer lexer(contents, InputFileName);
+    Token token;
+    bool ret = lexer.GetNextToken(token);
+    while(ret){
+        ret = lexer.GetNextToken(token);
+    }
 }
 
 void printUsage(const std::vector<std::string>& args){
