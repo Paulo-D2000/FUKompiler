@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <memory>
 
 #define LogError(err) std::cerr << "ERROR - " << __FUNCTION__ << "() " << err << "\n";
 #define LogDebug(dbg) std::cerr << "DEBUG - " << __FUNCTION__ << "() " << dbg << "\n";
@@ -20,6 +21,15 @@ enum TokenType{
     TK_LIT_CHAR,
     TK_RETURN,
     TK_EQUAL,
+    TK_PLUS,
+    TK_MINUS,
+    TK_STAR,
+    TK_SLASH,
+    TK_PERCENT,
+    TK_AND,
+    TK_OR,
+    TK_PLUS_PLUS,
+    TK_MINUS_MINUS
 };
 
 static const std::string TokenTypeNames[] = {
@@ -34,7 +44,16 @@ static const std::string TokenTypeNames[] = {
     "TK_LIT_STR",
     "TK_LIT_CHAR",
     "TK_RETURN",
-    "TK_EQUAL"
+    "TK_EQUAL",
+    "TK_PLUS",
+    "TK_MINUS",
+    "TK_STAR",
+    "TK_SLASH",
+    "TK_PERCENT",
+    "TK_AND",
+    "TK_OR",
+    "TK_PLUS_PLUS",
+    "TK_MINUS_MINUS"
 };
 
 struct Location{
@@ -54,6 +73,10 @@ struct Token{
     Location loc;
 };
 
+struct Expression{
+    Token lit;
+};
+
 struct Statement {
     virtual ~Statement() {}
 };
@@ -66,7 +89,7 @@ struct FuncCallStmt: Statement
 
 struct RetStmt: Statement
 {
-    std::string expr;
+    Expression expr;
 };
 
 struct VarDeclStmt: Statement

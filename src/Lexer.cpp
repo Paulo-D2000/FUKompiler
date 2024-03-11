@@ -149,6 +149,68 @@ bool Lexer::next_token(Token& token){
         token.type = TK_EQUAL;
         token.value = first;
         return true;
+
+    case '+':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_PLUS;
+        token.value = first;
+        if(not_empty()){
+            char next = m_src.at(m_curr);
+            if(next == '+'){
+                token.loc = m_loc;
+                token.type = TK_PLUS_PLUS;
+                token.value = std::string({first,next});
+                return true;
+            }else if(std::isdigit(next) || std::isspace(next)){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        break;
+
+    case '-':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_MINUS;
+        token.value = first;
+        return true;
+
+    case '*':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_STAR;
+        token.value = first;
+        return true;
+
+    case '%':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_PERCENT;
+        token.value = first;
+        return true;
+
+    case '/':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_SLASH;
+        token.value = first;
+        return true;
+        
+    case '&':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_AND;
+        token.value = first;
+        return true;
+
+    case '|':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_OR;
+        token.value = first;
+        return true;
     
     default:
         break;

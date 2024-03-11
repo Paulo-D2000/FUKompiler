@@ -48,8 +48,8 @@ void GeneratePy(const Func& func){
     for (const auto& stmt : func.body)
     {
         if (auto* type = dynamic_cast<RetStmt*>(stmt.get())) {
-            LogDebug(typeid(*type).name() << " " << type->expr);
-            std::cout << "  return " << type->expr << "\n";
+            LogDebug(typeid(type->expr.lit.type).name() << " " << type->expr.lit.value);
+            std::cout << "  return " << type->expr.lit.value << "\n";
         }
         else if (auto* type = dynamic_cast<FuncCallStmt*>(stmt.get())) {
             if(type->name.value == "printf"){
@@ -83,10 +83,15 @@ void Compile(const std::string& InputFileName, const std::string& OutpuFileName)
     Lexer lexer(contents, InputFileName);
     Token token;
     Func func;
-    bool ret = parse_function(lexer, token, func);
-    while(ret){
+    int ret = parse_function(lexer, token, func);
+    while(ret == 1){
         GeneratePy(func);
         ret = parse_function(lexer, token, func);
+    }
+    if(ret != -1){
+        std::cerr << "Done. Compilation was sucessfull\n";
+    }else{
+        LogError("Compliation returned error " << ret);
     }
 }
 

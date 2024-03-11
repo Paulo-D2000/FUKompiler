@@ -54,20 +54,39 @@ bool parse_arglist(Lexer& lexer, std::vector<Token>& arglist){
     return true;
 }
 
+bool parse_expression(Lexer& lexer, Expression& expr){
+    Token token;
+    if(!expect_token(lexer, token, TK_LIT_INT, TK_NAME)) return false;
+    if(token.type == TK_NAME){
+        // FUNC OR VAR
+        // update expr
+        LogError(token.loc.display() << ": Parsing of TK_NAME " << token.value << " is not implemented yet!")
+    }
+    expr.lit = token;
+    return true;
+}
+
 bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block){
     Token token;
     if(!expect_token(lexer, token, TK_OCURLY)) return false;
 
     Token name, expr, value;
+    Expression ret_expr;
     std::vector<Token> arglist;
     while(1){
         if(!expect_token(lexer, name, TK_NAME, TK_CCURLY)) return false;
         if(name.type == TK_CCURLY) break;
 
         if(name.value == "return"){
-            if(!expect_token(lexer, expr, TK_LIT_INT)) return false;
+            //if(!expect_token(lexer, expr, TK_LIT_INT, TK_NAME)) return false;
+            //if(expr.type == TK_NAME){
+            //    // FUNC OR VAR
+            //    // update expr
+            //    LogError(expr.loc.display() << ": TK_NAME " << expr.value << " is unknown")
+            //}
+            if(!parse_expression(lexer, ret_expr)) return false;
             std::shared_ptr<RetStmt> retStmt = std::make_shared<RetStmt>();
-            retStmt->expr = expr.value;
+            retStmt->expr = ret_expr;
             block.push_back(std::move(retStmt));
         }
         else{
@@ -114,25 +133,28 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block){
             }
         }
 
-        if(!expect_token(lexer, token, TK_SEMICOL)) return false;
+        if(!expect_token(lexer, token, TK_SEMICOL)){
+            LogError(token.loc.display() << ": Expected ; here but got " << token.value);
+            return false;
+        }
     }
     return true;
 }
 
-bool parse_function(Lexer& lexer, Token& token, Func& func){
+int parse_function(Lexer& lexer, Token& token, Func& func){
     if(lexer.isEOF()){
-        return false;
+        return 0;
     }
-    if(!parse_type(lexer, token)) return false;
+    if(!parse_type(lexer, token)) return -1;
 
     Token name;
-    if(!expect_token(lexer,  name, TK_NAME)) return false;
+    if(!expect_token(lexer,  name, TK_NAME)) return -1;
 
-    if(!expect_token(lexer, token, TK_OPAREN)) return false;
-    if(!expect_token(lexer, token, TK_CPAREN)) return false;
+    if(!expect_token(lexer, token, TK_OPAREN)) return -1;
+    if(!expect_token(lexer, token, TK_CPAREN)) return -1;
 
     std::vector<std::shared_ptr<Statement>> body;
-    if(!parse_block(lexer, body)) return false;
+    if(!parse_block(lexer, body)) return -1;
 
     func.name = name;
     func.body = body;
