@@ -19,6 +19,15 @@ private:
         return m_curr < m_src.length();
     }
 
+    inline bool is_comment(){
+        if(not_empty() && m_src.at(m_curr) == '/'){
+            if(((m_curr + 1) < m_src.length()) && m_src.at(m_curr+1) == '/'){
+                return true;
+            }
+        }
+        return false;
+    }
+
     inline void update_loc(){
         m_loc.path = m_path;
         m_loc.row = m_row;
@@ -35,4 +44,7 @@ public:
     Lexer(const std::string& fileContent, const std::string& filePath);
 
     bool GetNextToken(Token& token);
+    inline bool isEOF(){
+        return (m_curr+1) == m_src.length();
+    }
 };

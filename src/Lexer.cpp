@@ -35,7 +35,7 @@ void Lexer::drop_line(){
 bool Lexer::next_token(Token& token){
     trim_left();
 
-    while(not_empty() && m_src.at(m_curr) == '#'){
+    while(not_empty() && (m_src.at(m_curr) == '#' || is_comment())){
         drop_line();
         trim_left();
     }
@@ -95,6 +95,13 @@ bool Lexer::next_token(Token& token){
         token.value = first;
         return true;
 
+    case ',':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_COMMA;
+        token.value = first;
+        return true;
+
     case '"':
         chop_char();
         start = m_curr;
@@ -113,6 +120,35 @@ bool Lexer::next_token(Token& token){
 
         LogError(m_loc.display() << ": unclosed string literal.");
         return false;
+
+    case 39:
+        chop_char();
+        start = m_curr;
+        while(not_empty() && m_src.at(m_curr) != '\''){
+            chop_char();
+        }
+
+        if(not_empty()){
+            std::string text = m_src.substr(start, m_curr - start);
+            chop_char();
+            if(text.length() > 1){
+                LogError(m_loc.display() << ": char literal must contain a single character.");
+            }
+            token.loc = m_loc;
+            token.type = TK_LIT_CHAR;
+            token.value = text;
+            return true;
+        }
+
+        LogError(m_loc.display() << ": unclosed char literal.");
+        return false;
+
+    case '=':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_EQUAL;
+        token.value = first;
+        return true;
     
     default:
         break;
@@ -129,6 +165,8 @@ bool Lexer::next_token(Token& token){
         token.value = val;
         return true;
     }
+
+    LogError(m_loc.display() << ": token error.");
 
     return false;
 }

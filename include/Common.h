@@ -14,9 +14,12 @@ enum TokenType{
     TK_OCURLY,
     TK_CCURLY,
     TK_SEMICOL,
+    TK_COMMA,
     TK_LIT_INT,
     TK_LIT_STR,
-    TK_RETURN
+    TK_LIT_CHAR,
+    TK_RETURN,
+    TK_EQUAL,
 };
 
 static const std::string TokenTypeNames[] = {
@@ -26,9 +29,12 @@ static const std::string TokenTypeNames[] = {
     "TK_OCURLY",
     "TK_CCURLY",
     "TK_SEMICOL",
+    "TK_COMMA",
     "TK_LIT_INT",
     "TK_LIT_STR",
-    "TK_RETURN"
+    "TK_LIT_CHAR",
+    "TK_RETURN",
+    "TK_EQUAL"
 };
 
 struct Location{
@@ -54,13 +60,20 @@ struct Statement {
 
 struct FuncCallStmt: Statement
 {
-    std::string name;
-    std::vector<std::string> args;
+    Token name;
+    std::vector<Token> args;
 };
 
 struct RetStmt: Statement
 {
     std::string expr;
+};
+
+struct VarDeclStmt: Statement
+{
+    std::string type;
+    std::string name;
+    Token value;
 };
 
 struct Func: Statement
@@ -69,12 +82,15 @@ struct Func: Statement
     std::vector<std::shared_ptr<Statement>> body;
 };
 
-inline std::string args2str(std::vector<std::string> args){
+
+inline std::string args2str(std::vector<Token> args){
     std::string ret = "";
-    for (auto &str : args)
+    for (size_t i = 0; i < args.size(); i++)
     {
-        ret += str;
-        ret += ", ";
+        ret += args[i].value;
+        if(i != args.size()-1){
+            ret += ", ";
+        }
     }
     return ret;
 }
