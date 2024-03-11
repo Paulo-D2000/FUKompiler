@@ -53,7 +53,7 @@ bool Lexer::next_token(Token& token){
         }
         
         token.loc = m_loc;
-        token.type = TokenType::TK_NAME;
+        token.type = TK_NAME;
         token.value = m_src.substr(start, m_curr - start);
         return true;
     }
@@ -63,35 +63,35 @@ bool Lexer::next_token(Token& token){
     case '(':
         chop_char();
         token.loc = m_loc;
-        token.type = TokenType::TK_OPAREN;
+        token.type = TK_OPAREN;
         token.value = first;
         return true;
 
     case ')':
         chop_char();
         token.loc = m_loc;
-        token.type = TokenType::TK_CPAREN;
+        token.type = TK_CPAREN;
         token.value = first;
         return true;
 
     case '{':
         chop_char();
         token.loc = m_loc;
-        token.type = TokenType::TK_OCURLY;
+        token.type = TK_OCURLY;
         token.value = first;
         return true;
 
     case '}':
         chop_char();
         token.loc = m_loc;
-        token.type = TokenType::TK_CCURLY;
+        token.type = TK_CCURLY;
         token.value = first;
         return true;
 
     case ';':
         chop_char();
         token.loc = m_loc;
-        token.type = TokenType::TK_SEMICOL;
+        token.type = TK_SEMICOL;
         token.value = first;
         return true;
 
@@ -106,7 +106,7 @@ bool Lexer::next_token(Token& token){
             std::string text = m_src.substr(start, m_curr - start);
             chop_char();
             token.loc = m_loc;
-            token.type = TokenType::TK_LIT_STR;
+            token.type = TK_LIT_STR;
             token.value = text;
             return true;
         }
@@ -125,7 +125,7 @@ bool Lexer::next_token(Token& token){
         }
         std::string val = m_src.substr(start, m_curr - start);
         token.loc = m_loc;
-        token.type = TokenType::TK_LIT_INT;
+        token.type = TK_LIT_INT;
         token.value = val;
         return true;
     }
@@ -135,6 +135,6 @@ bool Lexer::next_token(Token& token){
 
 bool Lexer::GetNextToken(Token& token){
     bool ret = next_token(token);
-    LogDebug(token.loc.display() << ": " << token.value);
+    LogDebug(token.loc.display() << ": " << TokenTypeNames[token.type] << ": " << token.value);
     return ret;
 }

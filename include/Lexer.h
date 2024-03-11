@@ -3,34 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-enum class TokenType{
-    TK_NAME=0,
-    TK_OPAREN,
-    TK_CPAREN,
-    TK_OCURLY,
-    TK_CCURLY,
-    TK_SEMICOL,
-    TK_LIT_INT,
-    TK_LIT_STR,
-    TK_RETURN
-};
-
-struct Location{
-    std::string path;
-    size_t row, col;
-
-    inline std::string display(){
-        std::stringstream ss;
-        ss << path << ":" << row + 1 << ":" << col + 1;
-        return ss.str();
-    }
-};
-
-struct Token{
-    TokenType type;
-    std::string value;
-    Location loc;
-};
+#include "Common.h"
 
 class Lexer
 {

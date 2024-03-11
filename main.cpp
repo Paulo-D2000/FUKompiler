@@ -4,11 +4,13 @@
 
 #include "Common.h"
 #include "Lexer.h"
+#include "Parser.h"
 
 void Compile(const std::string& InputFileName, const std::string& OutpuFileName){
     std::ifstream inFile(InputFileName);
     if(!inFile.good()){
         LogError("Unable to open file \'" << InputFileName << "\'");
+        exit(-1);
     }
     std::string contents;
     while(inFile){
@@ -17,10 +19,21 @@ void Compile(const std::string& InputFileName, const std::string& OutpuFileName)
     
     Lexer lexer(contents, InputFileName);
     Token token;
-    bool ret = lexer.GetNextToken(token);
-    while(ret){
-        ret = lexer.GetNextToken(token);
+    Func func;
+    bool ret = parse_function(lexer, token, func);
+    if(!ret){
+        exit(-1);
     }
+    for (const auto& stmt : func.body)
+    {
+        if (auto* type = dynamic_cast<RetStmt*>(stmt.get())) {
+            LogDebug(typeid(*type).name() << " " << type->expr);
+        }
+        else if (auto* type = dynamic_cast<FuncCallStmt*>(stmt.get())) {
+            LogDebug(typeid(*type).name() << " " << type->name << " " << args2str(type->args));
+        }
+    }
+    
 }
 
 void printUsage(const std::vector<std::string>& args){
@@ -44,7 +57,7 @@ void printUsage(const std::vector<std::string>& args){
     }
 
     // DEBUG
-    LogDebug("FUKargs:\n  CmdLine: " << cmdLine << "\n  InputFile: " << inputFileName << "\n  OutputFile: " << outputFileName);
+    LogDebug("\nFUKargs:\n  CmdLine: " << cmdLine << "\n  InputFile: " << inputFileName << "\n  OutputFile: " << outputFileName);
     
     // Compile
     Compile(inputFileName, outputFileName);
