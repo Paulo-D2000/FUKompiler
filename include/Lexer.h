@@ -19,6 +19,30 @@ private:
         return m_curr < m_src.length();
     }
 
+    inline bool is_multline_comment(){
+        static bool begin;
+        if(not_empty() && m_src.at(m_curr) == '/'){
+            if(((m_curr + 1) < m_src.length()) && m_src.at(m_curr+1) == '*'){
+                chop_char();
+                chop_char();
+                begin = true;
+                return true;
+            }
+        }
+        else if(begin && not_empty() && m_src.at(m_curr) == '*'){
+            if(((m_curr + 1) < m_src.length()) && m_src.at(m_curr+1) == '/'){
+                chop_char();
+                chop_char();
+                begin = false;
+                return true;
+            }
+        }
+        if(begin){
+            return true;
+        }
+        return false;
+    }
+
     inline bool is_comment(){
         if(not_empty() && m_src.at(m_curr) == '/'){
             if(((m_curr + 1) < m_src.length()) && m_src.at(m_curr+1) == '/'){
@@ -35,16 +59,21 @@ private:
     }
 
     void chop_char();
-    void trim_left();
     void drop_line();
     bool next_token(Token& token);
-
-public:
+    void trim_left();
+    
+    public:
     Lexer() {}
     Lexer(const std::string& fileContent, const std::string& filePath);
+    
+    bool Preprocessor();
 
     bool GetNextToken(Token& token);
     inline bool isEOF(){
-        return (m_curr+1) == m_src.length();
+        bool _eof = (m_curr+1) >= m_src.length();
+        if(_eof)
+            LogDebug("EOF");
+        return _eof;
     }
 };
