@@ -150,6 +150,7 @@ struct VarDeclStmt: Statement
 struct Func: Statement
 {
     Token name;
+    Token return_type;
     std::vector<ArgDecl> args;
     std::vector<std::shared_ptr<Statement>> body;
 };
@@ -212,6 +213,7 @@ inline void printStatement(std::shared_ptr<Statement> stmt, int indent = 0) {
     } else if (auto func = std::dynamic_pointer_cast<Func>(stmt)) {
         std::cerr << ind << "type: Func\n";
         std::cerr << ind << "name: " << func->name.value << "\n";
+        std::cerr << ind << "return_type: " << func->return_type.value << "\n";
         std::cerr << ind << "args: \n";
         for (size_t i = 0; i < func->args.size(); i++)
         {

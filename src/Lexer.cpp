@@ -69,6 +69,9 @@ bool Lexer::next_token(Token& token){
         token.loc = m_loc;
         token.type = TK_NAME;
         token.value = m_src.substr(start, m_curr - start);
+        if(token.value == "return"){
+            token.type = TK_RETURN;
+        }
         return true;
     }
 

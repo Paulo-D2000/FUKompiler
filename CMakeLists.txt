@@ -10,3 +10,6 @@ include_directories(include/)
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS src/*.cpp)
 
 add_executable(${PROJECT_NAME} main.cpp ${SRCS})
+
+# Unit test target: builds a small test runner that uses the same sources
+add_executable(unit_tests tests/test_parser.cpp ${SRCS})
