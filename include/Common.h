@@ -38,7 +38,15 @@ enum TokenType{
     TK_GREATER,
     TK_GREATER_EQUAL,
     TK_LESS,
-    TK_LESS_EQUAL
+    TK_LESS_EQUAL,
+    TK_INT,
+    TK_CHAR,
+    TK_FLOAT,
+    TK_VOID,
+    TK_IF,
+    TK_ELSE,
+    TK_WHILE,
+    TK_FOR
 };
 
 static const std::string TokenTypeNames[] = {
@@ -71,7 +79,15 @@ static const std::string TokenTypeNames[] = {
     "TK_GREATER",
     "TK_GREATER_EQUAL",
     "TK_LESS",
-    "TK_LESS_EQUAL"
+    "TK_LESS_EQUAL",
+    "TK_INT",
+    "TK_CHAR",
+    "TK_FLOAT",
+    "TK_VOID",
+    "TK_IF",
+    "TK_ELSE",
+    "TK_WHILE",
+    "TK_FOR"
 };
 
 struct Location{

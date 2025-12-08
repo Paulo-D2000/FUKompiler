@@ -72,6 +72,30 @@ bool Lexer::next_token(Token& token){
         if(token.value == "return"){
             token.type = TK_RETURN;
         }
+        else if (token.value == "int"){
+            token.type = TK_INT;
+        }
+        else if (token.value == "char"){
+            token.type = TK_CHAR;
+        }
+        else if (token.value == "float"){
+            token.type = TK_FLOAT;
+        }
+        else if (token.value == "void"){
+            token.type = TK_VOID;
+        }
+        else if (token.value == "if"){
+            token.type = TK_IF;
+        }
+        else if (token.value == "else"){
+            token.type = TK_ELSE;
+        }
+        else if (token.value == "while"){
+            token.type = TK_WHILE;
+        }
+        else if (token.value == "for"){
+            token.type = TK_FOR;
+        }
         return true;
     }
 

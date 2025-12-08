@@ -34,31 +34,6 @@ bool expect_token(Lexer& lexer, Token& token, const TokenType& first, const Type
     }
 }
 
-bool parse_type(Lexer& lexer, Token& token){
-    bool ret = expect_token(lexer, token, TK_NAME);
-
-    if(token.value == std::string("int")){
-        return ret;
-    }
-    else if (token.value == std::string("double")){
-        return ret;
-    }
-    else if (token.value == std::string("float")){
-        return ret;
-    }
-    else if (token.value == std::string("char")){
-        return ret;
-    }
-    else if (token.value == std::string("void")){
-        return ret;
-    }
-    else
-    {
-        LogError(token.loc.display() << ": Unexpected type " << token.value);
-        return false;
-    }
-}
-
 bool parse_arglist(Lexer& lexer, std::vector<Token>& arglist){
     Token token, expr;
     bool end = false;
@@ -256,8 +231,10 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
     Token name, expr, value;
     std::shared_ptr<Expression> parse_expr;
     std::vector<Token> arglist;
+    int expected_returns = func_ret_type.value == "void" ? 0 : 1;
+    int actual_returns = 0;
     while(1){
-        if(!expect_token(lexer, name, TK_NAME, TK_RETURN, TK_CCURLY)){
+        if(!expect_token(lexer, name, TK_NAME, TK_INT, TK_FLOAT, TK_CHAR, TK_VOID, TK_IF, TK_ELSE, TK_WHILE, TK_FOR, TK_RETURN, TK_CCURLY)){
             LogError(name.loc.display() << ": Expected statement here but got " << name.value);
             return false;
         }
@@ -271,12 +248,13 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
             break;
         }
 
-        if(name.value == "return"){
+        if(name.type == TK_RETURN){
             if(func_ret_type.value != "void"){
                 if(!parse_expression(lexer, parse_expr)) return false;
                 std::shared_ptr<RetStmt> retStmt = std::make_shared<RetStmt>();
                 retStmt->expr = std::move(parse_expr);
                 block.push_back(std::move(retStmt));
+                actual_returns++;
                 continue;
             }
             else{
@@ -293,6 +271,10 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
             //    LogError(expr.loc.display() << ": TK_NAME " << expr.value << " is unknown")
             //}
         }
+        else if(name.type == TK_IF || name.type == TK_ELSE || name.type == TK_WHILE || name.type == TK_FOR){
+            LogError(name.loc.display() << ": Control flow statements not implemented yet!");
+            return false;
+        }
         else{
             if(!expect_token(lexer, expr, TK_OPAREN, TK_NAME)) return false;
 
@@ -306,7 +288,7 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
             }
             else if(expr.type == TK_NAME){
                 // variable
-                if(!expect_token(lexer, token, TK_EQUAL)){
+                if(!expect_token(lexer, token, TK_EQUAL, TK_SEMICOL)){
                     LogError(token.loc.display() << ": Expected = here but got " << token.value);
                     return false;
                 }
@@ -335,12 +317,22 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
                 //default:
                 //    return false;
                 //}
-                if(!parse_expression(lexer, parse_expr)) return false;
-                std::shared_ptr<VarDeclStmt> varStmt = std::make_shared<VarDeclStmt>();
-                varStmt->name = expr.value;
-                varStmt->expr = parse_expr;
-                block.push_back(std::move(varStmt));
-                continue;
+                if(token.type == TK_EQUAL){
+                    if(!parse_expression(lexer, parse_expr)) return false;
+                    std::shared_ptr<VarDeclStmt> varStmt = std::make_shared<VarDeclStmt>();
+                    varStmt->name = expr.value;
+                    varStmt->expr = parse_expr;
+                    block.push_back(std::move(varStmt));
+                    continue;
+                }
+                else{
+                    // semicol, just declaration, null expression ?
+                    std::shared_ptr<VarDeclStmt> varStmt = std::make_shared<VarDeclStmt>();
+                    varStmt->name = expr.value;
+                    varStmt->expr = nullptr;
+                    block.push_back(std::move(varStmt));
+                    continue;
+                }
             }
         }
 
@@ -348,6 +340,10 @@ bool parse_block(Lexer& lexer, std::vector<std::shared_ptr<Statement>>& block, c
             LogError(token.loc.display() << ": Expected ; here but got " << token.value);
             return false;
         }
+    }
+    if(expected_returns != actual_returns){
+        LogError("Function expected to have " << expected_returns << " return statements, but got " << actual_returns);
+        return false;
     }
     return true;
 }
@@ -357,30 +353,45 @@ int parse_function(Lexer& lexer, Token& token, Func& func){
     if(!lexer.Preprocessor()) return false;
 
     // Return type
-    if(!parse_type(lexer, token)) return -1;
+    if(!expect_token(lexer, token, TK_INT, TK_CHAR, TK_VOID, TK_FLOAT)){
+        LogError(token.loc.display() << ": Expected function return type here but got " << token.value);
+        return -1;
+    }
     Token ret_type = token;
 
     // Func name
     Token name;
-    if(!expect_token(lexer,  name, TK_NAME)) return -1;
+    if(!expect_token(lexer,  name, TK_NAME)){
+        LogError(name.loc.display() << ": Expected function name here but got " << name.value);
+        return -1;
+    }
 
     // Args
     std::vector<ArgDecl> args;
-    if(!expect_token(lexer, token, TK_OPAREN)) return -1;
+    if(!expect_token(lexer, token, TK_OPAREN)){
+        LogError(token.loc.display() << ": Expected ( here but got " << token.value);
+        return -1;
+    }
     while(1){
-        if(!expect_token(lexer, token, TK_NAME, TK_COMMA, TK_CPAREN)) return -1;
+        if(!expect_token(lexer, token, TK_INT, TK_CHAR, TK_VOID, TK_FLOAT, TK_COMMA, TK_CPAREN)){
+            LogError(token.loc.display() << ": Expected argument type, comma or ) here but got " << token.value);
+            return -1;
+        }
         if(token.type == TK_CPAREN)
             break;
-        else if(token.type == TK_NAME){
+        else if(token.type == TK_INT || token.type == TK_CHAR || token.type == TK_VOID || token.type == TK_FLOAT){
             ArgDecl arg;
             arg.type = token;
-            if(!expect_token(lexer, token, TK_NAME, TK_STAR)) return -1;
+            if(!expect_token(lexer, token, TK_NAME, TK_STAR)){
+                LogError(token.loc.display() << ": Expected argument name here or star but got " << token.value);
+                return -1;
+            }
             if(token.type == TK_STAR){
                 LogError(token.loc.display() << ": Pointer types not supported yet.");
                 return -1;
             }
             else{
-                if(arg.type.value == "void"){
+                if(arg.type.type == TK_VOID){
                     LogError(token.loc.display() << ": Invalid argument name 'void'.");
                     return -1;
                 }
@@ -395,7 +406,10 @@ int parse_function(Lexer& lexer, Token& token, Func& func){
 
     // body
     std::vector<std::shared_ptr<Statement>> body;
-    if(!parse_block(lexer, body, ret_type)) return -1;
+    if(!parse_block(lexer, body, ret_type)){
+        LogError(token.loc.display() << ": Error parsing function body for function " << name.value);
+        return -1;
+    }
     
     func.name = name;
     func.return_type = ret_type;

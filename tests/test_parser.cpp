@@ -41,7 +41,24 @@ int main(){
         {"test_void_fun_ret_diff_type_args", "int test_void_fun_ret_diff_type_args(int arg0, float arg1, char arg2){\n    // Should pass... \n    return 0;\n}\n", true},
         {"test_unary_ops", "int test_unary_ops(int a){\n    int paren_lit = (0); // should pass\n    int paren_var = (a); // should pass\n    return 0;\n}\n", true},
         {"test_binaryops", "int test_binaryops(int a, int b){\n    int _add = a + b;\n    int _sub = a - b;\n    int _mul = a * b;\n    int _div = a / b;\n    int _or = a | b;\n    int _and = a & b;\n    int _xor = a ^ b;\n    int gt = a > b;\n    int lt = a < b;\n    int gteq = a >= b;\n    int leq = a <= b;\n    int eq = a == b;\n    return 0;\n}\n", true},
-        {"test_binaryop_chain", "int test_binaryop_chain(){\n    return 1 + 2 + 3 + 4 + 5;\n}\n", true}
+        {"test_binaryop_chain", "int test_binaryop_chain(){\n    return 1 + 2 + 3 + 4 + 5;\n}\n", true},
+        {"test_pointer_arg", "int test_pointer_arg(int* arg){\n    // Should fail... \n    return 0;\n}\n", false},
+        {"test_var_decl_int", "int test_var_decl_int(){\n    int a;\n    return 0;\n}\n", true},
+        {"test_var_decl_float", "int test_var_decl_float(){\n    float a;\n    return 0;\n}\n", true},
+        {"test_var_decl_char", "int test_var_decl_char(){\n    char a;\n    return 0;\n}\n", true},
+        {"test_var_assign_int", "int test_var_assign_int(){\n    int a = 10;\n    return 0;\n}\n", true},
+        {"test_var_assign_float", "int test_var_assign_float(){\n    float a = 10.5;\n    return 0;\n}\n", true},
+        {"test_var_assign_char", "int test_var_assign_char(){\n    char a = 'c';\n    return 0;\n}\n", true},
+        {"test_var_assign_expr", "int test_var_assign_expr(){\n    int a = 5 + 10 * (2 - 1);\n    return 0;\n}\n", true},
+        {"test_missing_return", "int test_missing_return(){\n    int a = 10;\n}\n", false},
+        {"test_extra_return_value_void", "void test_extra_return_value_void(){\n    return 1;\n}\n", false},
+        {"test_no_statements_void_func", "void test_no_statements_void_func(){}\n", true},
+        {"test_no_statements_nonvoid_func", "int test_no_statements_nonvoid_func(){}\n", false},
+        {"test_if_statement", "int test_if_statement(int a){\n    if(a > 0){\n        return 1;\n    }else{\n        return 0;\n    }\n}\n", false},
+        {"test_while_loop", "int test_while_loop(){\n    int i = 0;\n    while(i < 10){\n        i = i + 1;\n    }\n    return i;\n}\n", false},
+        {"test_for_loop", "int test_for_loop(){\n    int sum = 0;\n    for(int i = 0; i < 10; i++){\n        sum = sum + i;\n    }\n    return sum;\n}\n", false},
+        {"test_multiple_returns", "int test_multiple_returns(int a){\n    if(a > 0){\n        return 1;\n    }\n    return 0;\n}\n", false},
+        {"test_return_in_loop", "int test_return_in_loop(){\n    for(int i = 0; i < 10; i++){\n        if(i == 5) return i;\n    }\n    return 0;\n}\n", false}
     };
 
     int failures = 0;
