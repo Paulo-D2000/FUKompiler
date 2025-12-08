@@ -95,6 +95,10 @@ void emitPyExpression(std::shared_ptr<Expression> expr, int indent = 0) {
             std::cout << ind << " or ";
             break;
 
+        case Xor:
+            std::cout << ind << " ^ ";
+            break;
+
         case Eq:
             std::cout << ind << " == ";
             break;
