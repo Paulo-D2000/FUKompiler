@@ -120,7 +120,7 @@ bool parse_expression(Lexer& lexer, std::shared_ptr<Expression>& expr){
     if(!expect_token(lexer, token, TK_SEMICOL,
         TK_CPAREN,
         TK_PLUS, TK_MINUS, TK_STAR, TK_SLASH,
-        TK_AND, TK_OR, TK_AND_AND, TK_OR_OR,
+        TK_AND, TK_OR, TK_AND_AND, TK_OR_OR, TK_XOR,
         TK_GREATER, TK_LESS, TK_GREATER_EQUAL, TK_LESS_EQUAL, TK_EQUAL_EQUAL
     )) return false;
 
@@ -183,6 +183,15 @@ bool parse_expression(Lexer& lexer, std::shared_ptr<Expression>& expr){
     else if(token.type == TK_OR || token.type == TK_OR_OR){
         auto addexpr = std::make_shared<BinOp>();
         addexpr->type = Or;
+        LogDebug(BinOpTypeNames[addexpr->type]);
+        addexpr->lhs = std::move(expr_start);
+        if(!parse_expression(lexer, addexpr->rhs)) return false;
+        expr = std::move(addexpr);
+        return true;
+    }// xor
+    else if(token.type == TK_XOR){
+        auto addexpr = std::make_shared<BinOp>();
+        addexpr->type = Xor;
         LogDebug(BinOpTypeNames[addexpr->type]);
         addexpr->lhs = std::move(expr_start);
         if(!parse_expression(lexer, addexpr->rhs)) return false;

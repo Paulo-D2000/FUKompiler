@@ -32,6 +32,7 @@ enum TokenType{
     TK_AND_AND,
     TK_OR,
     TK_OR_OR,
+    TK_XOR,
     TK_PLUS_PLUS,
     TK_MINUS_MINUS,
     TK_GREATER,
@@ -64,6 +65,7 @@ static const std::string TokenTypeNames[] = {
     "TK_AND_AND",
     "TK_OR",
     "TK_OR_OR",
+    "TK_XOR",
     "TK_PLUS_PLUS",
     "TK_MINUS_MINUS",
     "TK_GREATER",
@@ -112,12 +114,12 @@ struct UnaryOp: Expression{
     std::shared_ptr<Expression> expr;
 };
 
-enum BinOpType {Add=0, Sub, Mul, Div, And, Or, Gt, Lt, GtEq, LtEq, Eq};
+enum BinOpType {Add=0, Sub, Mul, Div, And, Or, Xor, Gt, Lt, GtEq, LtEq, Eq};
 static const std::string BinOpTypeNames[] = {
     "BinOpAdd", "BinOpSub", "BinOpMul", "BinOpDiv",
-    "BinOpAnd", "BinOpOr",
+    "BinOpAnd", "BinOpOr", "BinOpXor",
     "BinOpGt", "BinOpLt", "BinOpGtEq", "BinOpLtEq", "BinOpEq"
-    };
+};
 
 struct BinOp: Expression{
     BinOpType type;

@@ -283,6 +283,13 @@ bool Lexer::next_token(Token& token){
         }
         break;
 
+    case '^':
+        chop_char();
+        token.loc = m_loc;
+        token.type = TK_XOR;
+        token.value = first;
+        return true;
+
     case '>':
         chop_char();
         token.loc = m_loc;

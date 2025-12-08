@@ -80,6 +80,7 @@ int test_binaryops(int a, int b){
     int _div = a / b;
     int _or = a | b;
     int _and = a & b;
+    int _xor = a ^ b;
     int gt = a > b;
     int lt = a < b;
     int gteq = a >= b;
